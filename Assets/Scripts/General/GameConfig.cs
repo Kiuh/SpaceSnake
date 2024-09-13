@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using Newtonsoft.Json;
 using UnityEngine;
 
@@ -8,16 +7,58 @@ namespace General
     [Serializable]
     public class SavableData
     {
+        private int rockets;
+        private int batteries;
+        private int thunders;
+
+        public int Rockets
+        {
+            get => rockets;
+            set
+            {
+                if (value < 0)
+                {
+                    return;
+                }
+
+                rockets = value;
+                OnMutableDataChanged?.Invoke();
+            }
+        }
+        public int Batteries
+        {
+            get => batteries;
+            set
+            {
+                if (value < 0)
+                {
+                    return;
+                }
+
+                batteries = value;
+                OnMutableDataChanged?.Invoke();
+            }
+        }
+        public int Thunders
+        {
+            get => thunders;
+            set
+            {
+                if (value < 0)
+                {
+                    return;
+                }
+
+                thunders = value;
+                OnMutableDataChanged?.Invoke();
+            }
+        }
+
         public event Action OnMutableDataChanged;
     }
 
     [Serializable]
-    public class StaticData
-    {
-        public int BombsCurrency;
-        public int MagnetCurrency;
-        public List<int> DailyRewards;
-    }
+    public class StaticData { }
 
     [CreateAssetMenu(fileName = "GameConfig", menuName = "Configs/GameConfig")]
     internal class GameConfig : ScriptableObject
