@@ -1,5 +1,4 @@
 ﻿using System;
-using DG.Tweening;
 using General;
 using ScreensManagement;
 using TMPro;
@@ -30,6 +29,7 @@ namespace Screens.Game
                     return;
                 }
                 Used?.Invoke();
+                UpdateView();
             });
         }
 
@@ -50,6 +50,51 @@ namespace Screens.Game
         }
     }
 
+    public class Timer
+    {
+        public float Duration;
+        public event Action OnEnd;
+        public float currentTime;
+
+        public bool IsTicking { get; private set; } = false;
+
+        public void Start()
+        {
+            currentTime = 0;
+            IsTicking = true;
+        }
+
+        public void Stop()
+        {
+            IsTicking = false;
+        }
+
+        public void AddTime(float time)
+        {
+            currentTime -= time;
+        }
+
+        public void Update(float deltaTime)
+        {
+            if (!IsTicking)
+            {
+                return;
+            }
+
+            currentTime += deltaTime;
+            if (Duration <= currentTime)
+            {
+                OnEnd?.Invoke();
+                Stop();
+            }
+        }
+
+        public int GetSeconds()
+        {
+            return (int)(Duration - currentTime);
+        }
+    }
+
     [AddComponentMenu("Scripts/Screens/Game/Screens.Game")]
     internal class GameImpl : CanvasGroupScreen
     {
@@ -66,9 +111,6 @@ namespace Screens.Game
         private Bar planets;
 
         [SerializeField]
-        private Bar money;
-
-        [SerializeField]
         private TransitionCall win;
 
         [SerializeField]
@@ -77,49 +119,115 @@ namespace Screens.Game
         [SerializeField]
         private SnakeMover snakeMover;
 
+        [SerializeField]
+        private GameDone gameDone;
+
+        [SerializeField]
+        private TextMeshProUGUI timerLabel;
+
+        [SerializeField]
+        private TextMeshProUGUI levelNumber;
+
+        [SerializeField]
+        private ObstacleGenerator obstacleGenerator;
+
+        [SerializeField]
+        private PickupGenerator pickupGenerator;
+
+        [SerializeField]
+        private int batteryTimeAdd;
+
+        private int planetCollected;
+        private Timer timer = new();
+
         public override void AwakeInitialization()
         {
             rocket.Init(() => GameConfig.DynamicData.Rockets);
             rocket.Used += () => GameConfig.DynamicData.Rockets--;
             thunder.Init(() => GameConfig.DynamicData.Thunders);
-            thunder.Used += () => GameConfig.DynamicData.Thunders--;
+            thunder.Used += UseThunder;
             batteries.Init(() => GameConfig.DynamicData.Batteries);
-            batteries.Used += () => GameConfig.DynamicData.Batteries--;
+            batteries.Used += UseBattery;
+
+            snakeMover.OnPlanetCollected += SnakeMover_OnPlanetCollected;
+            snakeMover.OnObstacleHinted += SnakeMover_OnObstacleHinted;
+
+            timer.OnEnd += FinishGame;
         }
 
-        private Tween plLerp;
-        private Tween monLerp;
+        private void UseThunder()
+        {
+            GameConfig.DynamicData.Thunders--;
+            snakeMover.AddSpeedUp();
+        }
+
+        private void UseBattery()
+        {
+            GameConfig.DynamicData.Batteries--;
+            timer.AddTime(batteryTimeAdd);
+        }
+
+        private void SnakeMover_OnObstacleHinted()
+        {
+            KillGame();
+            lose.DoTransition();
+        }
+
+        private void SnakeMover_OnPlanetCollected()
+        {
+            planetCollected++;
+        }
 
         public void StartGame()
         {
-            snakeMover.StartMove();
+            snakeMover.ResetSnake();
+            snakeMover.EnableMovement();
+            obstacleGenerator.StartGenerate();
+            pickupGenerator.StartGenerate();
+            planetCollected = 0;
+            levelNumber.text = "Level " + (GameConfig.StaticData.currentLevelIndex + 1).ToString();
 
-            float plDur = UnityEngine.Random.Range(10f, 20f);
-            plLerp = DOVirtual.Float(0, 1, plDur, planets.Set).OnComplete(() => FinishGame(true));
-
-            float monDur = UnityEngine.Random.Range(10f, 20f);
-            monLerp = DOVirtual.Float(0, 1, monDur, money.Set).OnComplete(() => FinishGame(false));
+            int duration = GameConfig.StaticData.CurrentLevel.levelSeconds;
+            timer.Duration = duration;
+            timer.Start();
         }
 
-        public void FinishGame(bool isWin)
+        private void Update()
+        {
+            planets.Set(
+                planetCollected
+                    / (float)GameConfig.StaticData.CurrentLevel.starsRequirements.ForThreeStars
+            );
+            UpdateTimer(timer.GetSeconds());
+            timer.Update(Time.deltaTime);
+        }
+
+        public void UpdateTimer(int time)
+        {
+            timerLabel.text = "Time left: " + time.ToString() + "s";
+        }
+
+        public void FinishGame()
         {
             KillGame();
 
-            if (isWin)
+            if (planetCollected < GameConfig.StaticData.CurrentLevel.starsRequirements.ForOneStar)
             {
-                win.DoTransition();
+                lose.DoTransition();
             }
             else
             {
-                lose.DoTransition();
+                gameDone.SetGameDone(planetCollected, GameConfig.StaticData.CurrentLevel);
+                win.DoTransition();
             }
         }
 
         public void KillGame()
         {
-            plLerp?.Kill();
-            monLerp?.Kill();
-            snakeMover.StopMove();
+            obstacleGenerator.StopGenerate();
+            pickupGenerator.StopGenerate();
+            timer.Stop();
+            snakeMover.DisableMovement();
         }
     }
 }

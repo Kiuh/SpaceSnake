@@ -12,3 +12,25 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e6bf88315ca9bc34ea48f7cc45e5f9fa, type: 3}
   m_Name: GameConfig
   m_EditorClassIdentifier: 
+  internalStaticData:
+    currentLevelIndex: 0
+    currentSnakeSkin: 0
+    levels:
+    - levelSeconds: 30
+      coinsReward: 500
+      starsRequirements:
+        ForOneStar: 3
+        ForTwoStars: 6
+        ForThreeStars: 9
+    - levelSeconds: 30
+      coinsReward: 500
+      starsRequirements:
+        ForOneStar: 3
+        ForTwoStars: 6
+        ForThreeStars: 9
+    - levelSeconds: 30
+      coinsReward: 500
+      starsRequirements:
+        ForOneStar: 3
+        ForTwoStars: 6
+        ForThreeStars: 9

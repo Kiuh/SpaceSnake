@@ -12,6 +12,7 @@ namespace ScreensManagement
     {
         [SerializeField]
         private Button button;
+        public Button Button => button;
 
         [SerializeField]
         private List<SerializableInterface<IScreen>> nextScreens;

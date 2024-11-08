@@ -1,4 +1,6 @@
-﻿using DG.Tweening;
+﻿using System.Collections.Generic;
+using DG.Tweening;
+using General;
 using ScreensManagement;
 using UnityEngine;
 using UnityEngine.UI;
@@ -17,7 +19,13 @@ namespace Screens
         [SerializeField]
         private RectTransform handle;
 
-        private bool spinning = false;
+        [SerializeField]
+        private int spinCost;
+
+        [SerializeField]
+        private List<string> rewards;
+
+        private float OneSectionRotation => 360f / rewards.Count;
 
         public override void AwakeInitialization()
         {
@@ -26,24 +34,63 @@ namespace Screens
 
         private void SpinW()
         {
-            if (spinning)
+            if (GameConfig.DynamicData.Coins >= spinCost)
+            {
+                GameConfig.DynamicData.Coins -= spinCost;
+            }
+            else
             {
                 return;
             }
 
-            spinning = true;
+            UILocker.Lock();
+
             Sequence sequence = DOTween.Sequence();
 
+            int index = Random.Range(0, rewards.Count);
+            float endRotation = (OneSectionRotation / 2) + (OneSectionRotation * index);
+
             Tween spinTween = handle
-                .DOLocalRotate(Vector3.forward * (360 * 15), 6, RotateMode.LocalAxisAdd)
+                .DOLocalRotate(
+                    Vector3.forward * ((360 * 15) + endRotation),
+                    6,
+                    RotateMode.LocalAxisAdd
+                )
                 .SetEase(Ease.InOutQuad);
+
+            Tween spinBackTween = handle
+                .DOLocalRotate(Vector3.zero, 0.7f, RotateMode.Fast)
+                .SetEase(Ease.Linear);
 
             _ = sequence.Append(spinTween);
             _ = sequence.AppendCallback(() =>
             {
-                spinning = false;
-                call.DoTransition();
+                GiveReward(rewards[index]);
             });
+            _ = sequence.Append(spinBackTween);
+            _ = sequence.AppendCallback(UILocker.UnLock);
+        }
+
+        private void GiveReward(string rew)
+        {
+            if (int.TryParse(rew, out int amount))
+            {
+                GameConfig.DynamicData.Coins += amount;
+                return;
+            }
+
+            if (rew == "Thunder")
+            {
+                GameConfig.DynamicData.Thunders++;
+            }
+            if (rew == "Battery")
+            {
+                GameConfig.DynamicData.Batteries++;
+            }
+            if (rew == "Rocket")
+            {
+                GameConfig.DynamicData.Rockets++;
+            }
         }
     }
 }
