@@ -137,6 +137,8 @@ namespace General
         {
             LoadData();
             internalMutableData.OnMutableDataChanged += SaveData;
+            //internalMutableData.OnMutableDataChanged += () =>
+            //    Debug.Log(PlayerPrefs.GetString(GAME_DATA_LABEL, string.Empty));
         }
 
         private void LoadData()

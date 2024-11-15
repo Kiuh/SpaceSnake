@@ -82,15 +82,20 @@ namespace Screens
             if (rew == "Thunder")
             {
                 GameConfig.DynamicData.Thunders++;
+                return;
             }
             if (rew == "Battery")
             {
                 GameConfig.DynamicData.Batteries++;
+                return;
             }
             if (rew == "Rocket")
             {
                 GameConfig.DynamicData.Rockets++;
+                return;
             }
+
+            Debug.Log("No reward given");
         }
     }
 }

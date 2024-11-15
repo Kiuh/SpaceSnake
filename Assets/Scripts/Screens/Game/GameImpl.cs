@@ -200,6 +200,9 @@ namespace Screens.Game
             );
             UpdateTimer(timer.GetSeconds());
             timer.Update(Time.deltaTime);
+            rocket.UpdateView();
+            thunder.UpdateView();
+            batteries.UpdateView();
         }
 
         public void UpdateTimer(int time)
