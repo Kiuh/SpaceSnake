@@ -8,7 +8,7 @@ namespace General
     [Serializable]
     public class SavableData
     {
-        private int coins = 500;
+        public int coins;
         private int rockets;
         private int batteries;
         private int thunders;
@@ -16,9 +16,9 @@ namespace General
         private float sound;
         private float music;
 
-        public int currentSkin = 0;
-        public List<int> levelStars = new() { 0, 0, 0, 0, 0, 0 };
-        public List<bool> unlockedSkins = new() { true, false, false, false };
+        public int currentSkin;
+        public List<int> levelStars;
+        public List<bool> unlockedSkins;
 
         public int Rockets
         {
@@ -137,15 +137,20 @@ namespace General
         {
             LoadData();
             internalMutableData.OnMutableDataChanged += SaveData;
-            //internalMutableData.OnMutableDataChanged += () =>
-            //    Debug.Log(PlayerPrefs.GetString(GAME_DATA_LABEL, string.Empty));
+            internalMutableData.OnMutableDataChanged += () =>
+                Debug.Log(PlayerPrefs.GetString(GAME_DATA_LABEL, string.Empty));
         }
 
         private void LoadData()
         {
             string rawData = PlayerPrefs.GetString(GAME_DATA_LABEL, string.Empty);
             internalMutableData = JsonConvert.DeserializeObject<SavableData>(rawData);
-            internalMutableData ??= new();
+            internalMutableData ??= new()
+            {
+                Coins = 500,
+                levelStars = new() { 0, 0, 0, 0, 0, 0 },
+                unlockedSkins = new() { true, false, false, false }
+            };
         }
 
         private void SaveData()

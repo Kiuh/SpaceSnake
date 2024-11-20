@@ -21,6 +21,9 @@ namespace Screens.Game
         [SerializeField]
         private float generationInterval;
 
+        [SerializeField]
+        private GameImpl gameImpl;
+
         private List<Pickup> created = new();
         private Tween generationTween;
 
@@ -30,6 +33,7 @@ namespace Screens.Game
         public void StartGenerate()
         {
             Pickup pickup = Instantiate(pickupPrefab, transform);
+            pickup.game = gameImpl;
             pickup.RectTransform.anchoredPosition = RandomPos;
             pickup.GetComponent<Image>().sprite = sprites[Random.Range(0, sprites.Count)];
             created.Add(pickup);

@@ -55,9 +55,11 @@ namespace Screens
         {
             musicSlider.Init();
             musicSlider.OnValueChanged += MusicSlider_OnValueChanged;
+            MusicSlider_OnValueChanged(GameConfig.DynamicData.Music);
 
             soundsSlider.Init();
             soundsSlider.OnValueChanged += SoundsSlider_OnValueChanged;
+            SoundsSlider_OnValueChanged(GameConfig.DynamicData.Sound);
         }
 
         public override void StartInitialization()

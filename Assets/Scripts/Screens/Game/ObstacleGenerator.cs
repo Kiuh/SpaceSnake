@@ -44,6 +44,12 @@ namespace Screens.Game
             _ = moveTween.OnComplete(StartGenerate);
         }
 
+        public void SkipCurrentObstacle()
+        {
+            StopGenerate();
+            StartGenerate();
+        }
+
         public void StopGenerate()
         {
             if (obstacle != null)

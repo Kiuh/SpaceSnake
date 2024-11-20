@@ -23,6 +23,9 @@ namespace Screens
         private List<GameObject> snakes;
 
         [SerializeField]
+        private List<GameObject> snakesLock;
+
+        [SerializeField]
         private Button buy;
 
         [SerializeField]
@@ -75,6 +78,7 @@ namespace Screens
             for (int i = 0; i < snakes.Count; i++)
             {
                 snakes[i].SetActive(false);
+                snakesLock[i].SetActive(false);
             }
             lockerObject.SetActive(false);
             buy.gameObject.SetActive(false);
@@ -92,6 +96,7 @@ namespace Screens
                 lockerObject.SetActive(true);
                 buy.gameObject.SetActive(true);
                 costLebel.text = cost[current].ToString();
+                snakesLock[current].SetActive(true);
             }
         }
     }

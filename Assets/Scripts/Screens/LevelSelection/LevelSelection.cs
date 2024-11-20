@@ -27,6 +27,7 @@ namespace Screens
             }
 
             OnShowStarts += LevelSelection_OnShowStarts;
+            LevelSelection_OnShowStarts();
         }
 
         private void TryClick(int levelInd)

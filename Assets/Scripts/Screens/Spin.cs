@@ -23,6 +23,9 @@ namespace Screens
         private int spinCost;
 
         [SerializeField]
+        private SpinWin spinWin;
+
+        [SerializeField]
         private List<string> rewards;
 
         private float OneSectionRotation => 360f / rewards.Count;
@@ -66,9 +69,10 @@ namespace Screens
             _ = sequence.AppendCallback(() =>
             {
                 GiveReward(rewards[index]);
+                spinWin.SetRewardImage(rewards[index]);
+                call.DoTransition();
             });
             _ = sequence.Append(spinBackTween);
-            _ = sequence.AppendCallback(UILocker.UnLock);
         }
 
         private void GiveReward(string rew)

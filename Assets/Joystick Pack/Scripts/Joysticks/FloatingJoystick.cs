@@ -1,7 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-using UnityEngine.EventSystems;
+﻿using UnityEngine.EventSystems;
 
 public class FloatingJoystick : Joystick
 {
@@ -9,6 +6,9 @@ public class FloatingJoystick : Joystick
     {
         base.Start();
         background.gameObject.SetActive(false);
+        EventSystem eventSystem = FindAnyObjectByType<EventSystem>();
+        OnPointerDown(new PointerEventData(eventSystem));
+        OnPointerUp(new PointerEventData(eventSystem));
     }
 
     public override void OnPointerDown(PointerEventData eventData)

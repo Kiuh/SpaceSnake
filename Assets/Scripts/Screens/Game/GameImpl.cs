@@ -137,13 +137,20 @@ namespace Screens.Game
         [SerializeField]
         private int batteryTimeAdd;
 
+        [SerializeField]
+        private int planetPointsAmount;
+        public RectTransform LablesParent;
+        public int PlanetPointsAmount => planetPointsAmount;
+
         private int planetCollected;
+        private int shields;
         private Timer timer = new();
 
         public override void AwakeInitialization()
         {
             rocket.Init(() => GameConfig.DynamicData.Rockets);
             rocket.Used += () => GameConfig.DynamicData.Rockets--;
+            rocket.Used += () => shields++;
             thunder.Init(() => GameConfig.DynamicData.Thunders);
             thunder.Used += UseThunder;
             batteries.Init(() => GameConfig.DynamicData.Batteries);
@@ -169,13 +176,21 @@ namespace Screens.Game
 
         private void SnakeMover_OnObstacleHinted()
         {
-            KillGame();
-            lose.DoTransition();
+            if (shields > 0)
+            {
+                obstacleGenerator.SkipCurrentObstacle();
+                shields--;
+            }
+            else
+            {
+                KillGame();
+                lose.DoTransition();
+            }
         }
 
         private void SnakeMover_OnPlanetCollected()
         {
-            planetCollected++;
+            planetCollected += planetPointsAmount;
         }
 
         public void StartGame()
@@ -185,6 +200,7 @@ namespace Screens.Game
             obstacleGenerator.StartGenerate();
             pickupGenerator.StartGenerate();
             planetCollected = 0;
+            shields = 0;
             levelNumber.text = "Level " + (GameConfig.StaticData.currentLevelIndex + 1).ToString();
 
             int duration = GameConfig.StaticData.CurrentLevel.levelSeconds;

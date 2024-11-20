@@ -125,6 +125,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9687682a85d72b341be1d5c183565646, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  labelPrefab: {fileID: 3242481681364624126, guid: a44bd820ef5c10d43bbf45d5a52d8157, type: 3}
+  game: {fileID: 0}
 --- !u!50 &695300722469281490
 Rigidbody2D:
   serializedVersion: 4

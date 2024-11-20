@@ -16,11 +16,12 @@ namespace Screens.Game
         [SerializeField]
         private TextMeshProUGUI coinsReward;
 
-        [SerializeField]
-        private TextMeshProUGUI rocketsReward;
-
         public void SetGameDone(int collected, LevelConfig config)
         {
+            stars[0].gameObject.SetActive(false);
+            stars[1].gameObject.SetActive(false);
+            stars[2].gameObject.SetActive(false);
+
             int star = 1;
             stars[0].gameObject.SetActive(true);
 
@@ -45,7 +46,6 @@ namespace Screens.Game
             GameConfig.DynamicData.SaveData();
 
             coinsReward.text = config.coinsReward.ToString();
-            rocketsReward.text = Random.Range(500, 1500).ToString();
         }
     }
 }
